@@ -1,0 +1,4 @@
+id,type,brand,model,year,plate,basePrice,available
+1,Sedan,Toyota,Corolla,2020,01A123BC,35,true
+2,SUV,Hyundai,Tucson,2022,01B777CD,55,true
+3,Electric,Tesla,Model 3,2021,01C333EF,80,true

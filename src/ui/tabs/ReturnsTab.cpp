@@ -40,7 +40,8 @@ void ReturnsTab::refresh() {
   if (!m_service) return;
 
   for (const auto& r : m_service->reservations()) {
-    if (r.status != "Active") continue;
+    // Show only reservations that have been returned in this tab
+    if (r.status != "Returned") continue;
 
     QString customerName = QString::number(r.customerId);
     if (auto c = m_service->findCustomer(r.customerId); c.has_value()) customerName = c->fullName;

@@ -98,7 +98,16 @@ void AddCarDialog::updatePreview() {
     m_imagePreview->setPixmap({});
     return;
   }
-  QPixmap px(file);
+  QString resolved = file;
+  // If we stored a relative path (e.g. images/foo.jpg), resolve it for preview
+  if (m_service && !QFileInfo(resolved).isAbsolute()) {
+    QString dataDir = m_service->dataDir();
+    if (!dataDir.isEmpty()) {
+      resolved = QDir(dataDir).filePath(resolved);
+    }
+  }
+
+  QPixmap px(resolved);
   if (px.isNull()) {
     m_imagePreview->setText("Cannot load image");
     m_imagePreview->setPixmap({});
@@ -137,6 +146,17 @@ VehiclePtr AddCarDialog::buildVehicle() const {
 
     QDir dir(dataDir);
     if (!dir.exists("images")) dir.mkpath("images");
+
+    // If user is editing and the image is already stored locally (relative path),
+    // do not re-copy; just keep the reference.
+    QFileInfo srcInfo(src);
+    if (!srcInfo.isAbsolute()) {
+      const QString localPath = dir.filePath(src);
+      if (QFile::exists(localPath)) {
+        v->imagePath = src;
+        return v;
+      }
+    }
 
     QFileInfo info(src);
     QString ext = info.suffix().isEmpty() ? "png" : info.suffix().toLower();

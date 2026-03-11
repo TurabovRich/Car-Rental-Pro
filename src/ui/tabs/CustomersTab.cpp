@@ -45,11 +45,18 @@ void CustomersTab::refresh() {
   m_model->removeRows(0, m_model->rowCount());
   if (!m_service) return;
   for (const auto& c : m_service->customers()) {
+    auto* idItem = new QStandardItem(QString::number(c.id));
+    auto* nameItem = new QStandardItem(c.fullName);
+    auto* licItem = new QStandardItem(c.licenseNo);
+    auto* phoneItem = new QStandardItem(c.phone);
+
+    idItem->setTextAlignment(Qt::AlignCenter);
+    nameItem->setTextAlignment(Qt::AlignCenter);
+    licItem->setTextAlignment(Qt::AlignCenter);
+    phoneItem->setTextAlignment(Qt::AlignCenter);
+
     QList<QStandardItem*> row;
-    row << new QStandardItem(QString::number(c.id))
-        << new QStandardItem(c.fullName)
-        << new QStandardItem(c.licenseNo)
-        << new QStandardItem(c.phone);
+    row << idItem << nameItem << licItem << phoneItem;
     m_model->appendRow(row);
   }
   m_table->resizeColumnsToContents();

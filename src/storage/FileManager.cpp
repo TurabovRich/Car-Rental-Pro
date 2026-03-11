@@ -2,6 +2,7 @@
 #include "domain/Vehicles.h"
 #include "utils/Exceptions.h"
 #include "utils/Date.h"
+#include <QDir>
 #include <QFile>
 #include <QTextStream>
 
@@ -97,6 +98,23 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
         else v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
 
         if (v) v->imagePath = imagePath;
+      }
+
+      // Auto-link image by plate if not provided in CSV
+      if (v && v->imagePath.trimmed().isEmpty()) {
+        QDir imagesDir(m_dataDir + "/images");
+        if (imagesDir.exists()) {
+          const QString base = v->plate.trimmed();
+          if (!base.isEmpty()) {
+            const QStringList filters = {
+              base + ".png", base + ".jpg", base + ".jpeg", base + ".webp", base + ".bmp"
+            };
+            const QStringList matches = imagesDir.entryList(filters, QDir::Files);
+            if (!matches.isEmpty()) {
+              v->imagePath = "images/" + matches.first();
+            }
+          }
+        }
       }
 
       if (v) vehicles.push_back(v);

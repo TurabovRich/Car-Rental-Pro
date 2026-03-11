@@ -126,22 +126,29 @@ void CarsTab::refresh() {
 
     auto* idItem = new QStandardItem(QString::number(v->id));
     auto* vehicleItem = new QStandardItem(v->brand + " " + v->model);
+    auto* typeItem = new QStandardItem(v->type());
     auto* yearItem = new QStandardItem(QString::number(v->year));
+    auto* plateItem = new QStandardItem(v->plate);
     auto* rateItem = new QStandardItem(QString::number(v->dailyRate(), 'f', 2));
-    idItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    vehicleItem->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    yearItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    rateItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    auto* availItem = new QStandardItem(v->available ? "true" : "false");
+
+    idItem->setTextAlignment(Qt::AlignCenter);
+    vehicleItem->setTextAlignment(Qt::AlignCenter);
+    typeItem->setTextAlignment(Qt::AlignCenter);
+    yearItem->setTextAlignment(Qt::AlignCenter);
+    plateItem->setTextAlignment(Qt::AlignCenter);
+    rateItem->setTextAlignment(Qt::AlignCenter);
+    availItem->setTextAlignment(Qt::AlignCenter);
 
     QList<QStandardItem*> row;
     row << imgItem
         << idItem
         << vehicleItem
-        << new QStandardItem(v->type())
+        << typeItem
         << yearItem
-        << new QStandardItem(v->plate)
+        << plateItem
         << rateItem
-        << new QStandardItem(v->available ? "true" : "false");
+        << availItem;
     m_model->appendRow(row);
   }
   m_table->resizeColumnsToContents();

@@ -53,14 +53,24 @@ void ReturnsTab::refresh() {
       plate = v->plate;
     }
 
+    auto* idItem = new QStandardItem(QString::number(r.id));
+    auto* custItem = new QStandardItem(customerName);
+    auto* vehItem = new QStandardItem(vehicleName);
+    auto* plateItem = new QStandardItem(plate);
+    auto* startItem = new QStandardItem(r.start.toIso());
+    auto* endItem = new QStandardItem(r.end.toIso());
+    auto* statusItem = new QStandardItem(r.status);
+
+    idItem->setTextAlignment(Qt::AlignCenter);
+    custItem->setTextAlignment(Qt::AlignCenter);
+    vehItem->setTextAlignment(Qt::AlignCenter);
+    plateItem->setTextAlignment(Qt::AlignCenter);
+    startItem->setTextAlignment(Qt::AlignCenter);
+    endItem->setTextAlignment(Qt::AlignCenter);
+    statusItem->setTextAlignment(Qt::AlignCenter);
+
     QList<QStandardItem*> row;
-    row << new QStandardItem(QString::number(r.id))
-        << new QStandardItem(customerName)
-        << new QStandardItem(vehicleName)
-        << new QStandardItem(plate)
-        << new QStandardItem(r.start.toIso())
-        << new QStandardItem(r.end.toIso())
-        << new QStandardItem(r.status);
+    row << idItem << custItem << vehItem << plateItem << startItem << endItem << statusItem;
     m_model->appendRow(row);
   }
   m_table->resizeColumnsToContents();

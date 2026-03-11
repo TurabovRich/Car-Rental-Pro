@@ -44,6 +44,9 @@ target_include_directories(CarRentalPro PRIVATE src)
 target_link_libraries(CarRentalPro PRIVATE ${QT_LIBS})
 
 add_custom_command(TARGET CarRentalPro POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:CarRentalPro>/data
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:CarRentalPro>/data
+  # Seed default data only once; never overwrite user's local changes in build/data
+  COMMAND ${CMAKE_COMMAND}
+    -Dsrc=${CMAKE_SOURCE_DIR}/data
+    -Ddst=$<TARGET_FILE_DIR:CarRentalPro>/data
+    -P ${CMAKE_SOURCE_DIR}/cmake/SeedData.cmake
 )

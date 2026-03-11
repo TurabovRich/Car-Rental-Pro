@@ -63,14 +63,24 @@ void ReportsTab::refresh() {
   m_kpiCars->setText("Cars\n" + QString::number((int)m_service->vehicles().size()));
 
   for (const auto& inv : m_service->invoices()) {
+    auto* idItem = new QStandardItem(QString::number(inv.id));
+    auto* resItem = new QStandardItem(QString::number(inv.reservationId));
+    auto* subItem = new QStandardItem(QString::number(inv.subtotal, 'f', 2));
+    auto* vatItem = new QStandardItem(QString::number(inv.vat, 'f', 2));
+    auto* lateItem = new QStandardItem(QString::number(inv.lateFee, 'f', 2));
+    auto* dmgItem = new QStandardItem(QString::number(inv.damageFee, 'f', 2));
+    auto* totalItem = new QStandardItem(QString::number(inv.total, 'f', 2));
+
+    idItem->setTextAlignment(Qt::AlignCenter);
+    resItem->setTextAlignment(Qt::AlignCenter);
+    subItem->setTextAlignment(Qt::AlignCenter);
+    vatItem->setTextAlignment(Qt::AlignCenter);
+    lateItem->setTextAlignment(Qt::AlignCenter);
+    dmgItem->setTextAlignment(Qt::AlignCenter);
+    totalItem->setTextAlignment(Qt::AlignCenter);
+
     QList<QStandardItem*> row;
-    row << new QStandardItem(QString::number(inv.id))
-        << new QStandardItem(QString::number(inv.reservationId))
-        << new QStandardItem(QString::number(inv.subtotal, 'f', 2))
-        << new QStandardItem(QString::number(inv.vat, 'f', 2))
-        << new QStandardItem(QString::number(inv.lateFee, 'f', 2))
-        << new QStandardItem(QString::number(inv.damageFee, 'f', 2))
-        << new QStandardItem(QString::number(inv.total, 'f', 2));
+    row << idItem << resItem << subItem << vatItem << lateItem << dmgItem << totalItem;
     m_model->appendRow(row);
   }
   m_table->resizeColumnsToContents();

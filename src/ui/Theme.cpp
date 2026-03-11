@@ -65,6 +65,7 @@ QTableView {
   background: #ffffff;
   border: 1px solid #e6e6e6;
   border-radius: 12px;
+  text-align: center;
   gridline-color: #eeeeee;
   selection-background-color: #dbe8ff;
   selection-color: #000000;

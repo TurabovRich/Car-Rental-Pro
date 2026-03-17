@@ -2,6 +2,7 @@
 #include "service/RentalService.h"
 #include "utils/Date.h"
 #include <stdexcept>
+#include <optional>
 #include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QComboBox>
@@ -9,6 +10,14 @@
 #include <QLabel>
 
 NewReservationDialog::NewReservationDialog(RentalService* service, QWidget* parent)
+  : NewReservationDialog(service, std::nullopt, std::nullopt, false, false, parent) {}
+
+NewReservationDialog::NewReservationDialog(RentalService* service,
+                                           std::optional<int> preselectedCustomerId,
+                                           std::optional<int> preselectedVehicleId,
+                                           bool lockCustomer,
+                                           bool lockVehicle,
+                                           QWidget* parent)
   : QDialog(parent), m_service(service) {
   setWindowTitle("New Reservation");
   auto* form = new QFormLayout(this);
@@ -16,11 +25,21 @@ NewReservationDialog::NewReservationDialog(RentalService* service, QWidget* pare
   m_customer = new QComboBox(this);
   for (const auto& c : m_service->customers())
     m_customer->addItem(QString::number(c.id) + " - " + c.fullName, c.id);
+  if (preselectedCustomerId.has_value()) {
+    int idx = m_customer->findData(*preselectedCustomerId);
+    if (idx >= 0) m_customer->setCurrentIndex(idx);
+  }
+  if (lockCustomer) m_customer->setEnabled(false);
 
   m_vehicle = new QComboBox(this);
   for (const auto& v : m_service->vehicles())
     if (v && v->available)
       m_vehicle->addItem(QString::number(v->id) + " - " + v->plate + " - " + v->type() + " " + v->brand + " " + v->model, v->id);
+  if (preselectedVehicleId.has_value()) {
+    int idx = m_vehicle->findData(*preselectedVehicleId);
+    if (idx >= 0) m_vehicle->setCurrentIndex(idx);
+  }
+  if (lockVehicle) m_vehicle->setEnabled(false);
 
   m_start = new QDateEdit(QDate::currentDate(), this);
   m_start->setCalendarPopup(true);

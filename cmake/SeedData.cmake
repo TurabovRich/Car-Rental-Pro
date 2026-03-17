@@ -17,6 +17,7 @@ copy_if_missing("cars.csv")
 copy_if_missing("customers.csv")
 copy_if_missing("reservations.csv")
 copy_if_missing("invoices.csv")
+copy_if_missing("users.csv")
 
 # Seed images folder only if missing (do not overwrite user-added images)
 if(EXISTS "${src}/images" AND NOT EXISTS "${dst}/images")

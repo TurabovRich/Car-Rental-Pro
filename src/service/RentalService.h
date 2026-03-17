@@ -31,12 +31,15 @@ public:
   void deleteVehicle(int id);
 
   void addCustomer(const Customer& c);
+  void updateCustomer(const Customer& c);
   void deleteCustomer(int id);
 
   Reservation createReservation(int customerId, int vehicleId, const Date& start, const Date& end);
   Invoice processReturn(int reservationId, int lateDays, double damageFee);
   Invoice processReturn(int reservationId, const Date& returnDate, double damageFee);
   Invoice previewReturn(int reservationId, const Date& returnDate, double damageFee) const;
+
+  bool isVehicleAvailable(int vehicleId, const Date& start, const Date& end) const;
 
   double totalRevenue() const;
 

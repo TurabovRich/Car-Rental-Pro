@@ -88,6 +88,16 @@ void RentalService::addCustomer(const Customer& c) {
   save();
 }
 
+void RentalService::updateCustomer(const Customer& c) {
+  auto it = std::find_if(m_customers.begin(), m_customers.end(), [&](const Customer& cur){ return cur.id == c.id; });
+  if (it == m_customers.end()) throw ValidationException("Customer not found");
+  Validation::requireNonEmpty(c.fullName, "Full name");
+  Validation::requireLicense(c.licenseNo);
+  Validation::requirePhone(c.phone);
+  *it = c;
+  save();
+}
+
 void RentalService::deleteCustomer(int id) {
   auto it = std::remove_if(m_customers.begin(), m_customers.end(), [&](const Customer& c){ return c.id == id; });
   if (it == m_customers.end()) throw ValidationException("Customer not found");
@@ -181,6 +191,10 @@ Invoice RentalService::previewReturn(int reservationId, const Date& returnDate, 
   double lateFee = lateDays * (v->dailyRate() * 1.5);
 
   return Invoice(0, reservationId, subtotal, lateFee, damageFee);
+}
+
+bool RentalService::isVehicleAvailable(int vehicleId, const Date& start, const Date& end) const {
+  return isVehicleAvailableForRange(vehicleId, start, end);
 }
 
 double RentalService::totalRevenue() const {

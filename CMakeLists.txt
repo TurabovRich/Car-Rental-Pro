@@ -26,6 +26,10 @@ add_executable(CarRentalPro
   src/ui/tabs/ReservationsTab.h src/ui/tabs/ReservationsTab.cpp
   src/ui/tabs/ReturnsTab.h src/ui/tabs/ReturnsTab.cpp
   src/ui/tabs/ReportsTab.h src/ui/tabs/ReportsTab.cpp
+  src/ui/tabs/UserPortalTab.h src/ui/tabs/UserPortalTab.cpp
+  src/ui/tabs/MyRentalsTab.h src/ui/tabs/MyRentalsTab.cpp
+  src/ui/tabs/UserProfileTab.h src/ui/tabs/UserProfileTab.cpp
+  src/ui/tabs/UserHistoryTab.h src/ui/tabs/UserHistoryTab.cpp
   src/ui/dialogs/AddCarDialog.h src/ui/dialogs/AddCarDialog.cpp
   src/ui/dialogs/AddCustomerDialog.h src/ui/dialogs/AddCustomerDialog.cpp
   src/ui/dialogs/NewReservationDialog.h src/ui/dialogs/NewReservationDialog.cpp
@@ -34,10 +38,13 @@ add_executable(CarRentalPro
   src/domain/Vehicle.h src/domain/Vehicles.h
   src/domain/Customer.h src/domain/Reservation.h src/domain/Invoice.h
   src/service/RentalService.h src/service/RentalService.cpp
+  src/service/AuthService.h src/service/AuthService.cpp
   src/storage/FileManager.h src/storage/FileManager.cpp
   src/utils/Exceptions.h
   src/utils/Validation.h src/utils/Validation.cpp
   src/utils/Date.h src/utils/Date.cpp
+  src/domain/UserAccount.h
+  src/ui/dialogs/AuthDialog.h src/ui/dialogs/AuthDialog.cpp
 )
 
 target_include_directories(CarRentalPro PRIVATE src)

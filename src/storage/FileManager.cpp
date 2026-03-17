@@ -16,6 +16,7 @@ QString FileManager::carsPath() const { return m_dataDir + "/cars.csv"; }
 QString FileManager::customersPath() const { return m_dataDir + "/customers.csv"; }
 QString FileManager::reservationsPath() const { return m_dataDir + "/reservations.csv"; }
 QString FileManager::invoicesPath() const { return m_dataDir + "/invoices.csv"; }
+QString FileManager::usersPath() const { return m_dataDir + "/users.csv"; }
 
 void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
                           std::vector<Customer>& customers,
@@ -243,5 +244,44 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
       out << inv.id << "," << inv.reservationId << "," << inv.subtotal << ","
           << inv.vat << "," << inv.lateFee << "," << inv.damageFee << "," << inv.total << "\n";
     }
+  }
+}
+
+void FileManager::loadUsers(std::vector<UserAccount>& users) {
+  users.clear();
+
+  QFile f(usersPath());
+  if (!f.exists()) return; // first run: no users yet
+  if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+    throw FileException("Cannot open " + usersPath().toStdString());
+
+  QTextStream in(&f);
+  bool first = true;
+  while (!in.atEnd()) {
+    QString line = in.readLine().trimmed();
+    if (line.isEmpty()) continue;
+    if (first) { first = false; continue; }
+    auto cols = splitCsvLine(line);
+    for (auto& c : cols) c = c.trimmed();
+    if (cols.size() < 4) continue;
+
+    UserAccount u;
+    u.id = cols[0].toInt();
+    u.username = cols[1];
+    u.passwordHashHex = cols[2];
+    u.role = cols[3];
+    u.customerId = (cols.size() >= 5) ? cols[4].toInt() : 0;
+    users.push_back(u);
+  }
+}
+
+void FileManager::saveUsers(const std::vector<UserAccount>& users) {
+  QFile f(usersPath());
+  if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
+    throw FileException("Cannot write " + usersPath().toStdString());
+  QTextStream out(&f);
+  out << "id,username,passwordHashHex,role,customerId\n";
+  for (const auto& u : users) {
+    out << u.id << "," << u.username << "," << u.passwordHashHex << "," << u.role << "," << u.customerId << "\n";
   }
 }

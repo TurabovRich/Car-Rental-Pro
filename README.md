@@ -1,13 +1,32 @@
 # CarRentalPro (Qt Widgets, C++17)
 
-A small car rental management demo app:
-- Cars CRUD (add/delete)
-- Customers CRUD (add/delete)
-- Reservations (create)
-- Returns (process return: late fee + damage fee)
-- Reports (invoice list + total revenue)
+A small local-first car rental demo app with two experiences:
+- **Admin panel**: cars/customers CRUD, reservations/returns, reports
+- **User app**: browse available cars by date range, reserve, return, profile, history
 
-Persistence: CSV files in `data/`.
+## Docs
+
+Start here: `docs/ARCHITECTURE.md`
+
+## Persistence (local)
+
+All data is stored as CSV files inside a `data/` directory (next to the built binary, or `./data` in dev):
+- `cars.csv`
+- `customers.csv`
+- `reservations.csv`
+- `invoices.csv`
+- `users.csv` (accounts)
+
+Important: `users.csv` stores **password hashes** (`SHA-256` hex), not raw passwords.
+
+## Authentication
+
+- On first run, the app ensures a default admin exists:
+  - username: `admin`
+  - password: `admin`
+- Registering a normal user creates:
+  - a `Customer` record in `customers.csv`
+  - a `UserAccount` record in `users.csv` linked via `customerId`
 
 ## Build
 ```bash
@@ -23,4 +42,4 @@ mkdir build
 cd build
 cmake ..
 make
-./CarRentalPro# Car-Rental-Pro
+./CarRentalPro

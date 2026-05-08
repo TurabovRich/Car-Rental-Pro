@@ -7,6 +7,8 @@ A small local-first car rental demo app with two experiences:
 ## Docs
 
 Start here: `docs/ARCHITECTURE.md`
+Course mapping: `docs/OOP_REQUIREMENTS_MAP.md`
+Presentation guide: `docs/PRESENTATION_PACK.md`
 
 ## Persistence (local)
 

@@ -7,4 +7,5 @@ public:
   static void requirePositive(double x, const char* fieldName);
   static void requirePhone(const QString& phone);
   static void requireLicense(const QString& lic);
+  static void requirePassword(const QString& password);
 };

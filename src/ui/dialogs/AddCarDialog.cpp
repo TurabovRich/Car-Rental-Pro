@@ -24,7 +24,7 @@ AddCarDialog::AddCarDialog(RentalService* service, QWidget* parent) : QDialog(pa
   auto* form = new QFormLayout(this);
 
   m_id = new QSpinBox(this); m_id->setRange(1, 1000000);
-  m_type = new QComboBox(this); m_type->addItems({"Sedan","SUV","Truck","Electric"});
+  m_type = new QComboBox(this); m_type->addItems({"Sedan","SUV","PremiumSUV","Truck","Electric"});
   m_brand = new QLineEdit(this);
   m_model = new QLineEdit(this);
   m_year = new QSpinBox(this); m_year->setRange(1980, 2100); m_year->setValue(2022);
@@ -135,6 +135,7 @@ VehiclePtr AddCarDialog::buildVehicle() const {
   VehiclePtr v;
   if (type == "Sedan") v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
   else if (type == "SUV") v = std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
+  else if (type == "PremiumSUV") v = std::make_shared<PremiumSUV>(id, brand, model, year, plate, basePrice, avail);
   else if (type == "Truck") v = std::make_shared<Truck>(id, brand, model, year, plate, basePrice, avail);
   else v = std::make_shared<Electric>(id, brand, model, year, plate, basePrice, avail);
 

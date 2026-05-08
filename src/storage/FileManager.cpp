@@ -2,6 +2,7 @@
 #include "domain/Vehicles.h"
 #include "utils/Exceptions.h"
 #include "utils/Date.h"
+#include "utils/CsvUtils.h"
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
@@ -67,6 +68,7 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
         else if (type == "SUV") v = std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
         else if (type == "Truck") v = std::make_shared<Truck>(id, brand, model, year, plate, basePrice, avail);
         else if (type == "Electric") v = std::make_shared<Electric>(id, brand, model, year, plate, basePrice, avail);
+        else if (type == "PremiumSUV") v = std::make_shared<PremiumSUV>(id, brand, model, year, plate, basePrice, avail);
         else v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
 
         if (v) {
@@ -96,6 +98,7 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
         else if (type == "SUV") v = std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
         else if (type == "Truck") v = std::make_shared<Truck>(id, brand, model, year, plate, basePrice, avail);
         else if (type == "Electric") v = std::make_shared<Electric>(id, brand, model, year, plate, basePrice, avail);
+        else if (type == "PremiumSUV") v = std::make_shared<PremiumSUV>(id, brand, model, year, plate, basePrice, avail);
         else v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
 
         if (v) v->imagePath = imagePath;
@@ -202,9 +205,8 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     out << "id,type,brand,model,year,plate,basePrice,available,imagePath\n";
     for (const auto& v : vehicles) {
       if (!v) continue;
-      out << v->id << "," << v->type() << "," << v->brand << "," << v->model << ","
-          << v->year << "," << v->plate << "," << v->basePrice << ","
-          << (v->available ? "true" : "false") << "," << v->imagePath << "\n";
+      out << CsvUtils::makeRow(v->id, v->type(), v->brand, v->model, v->year, v->plate,
+                               v->basePrice, (v->available ? "true" : "false"), v->imagePath);
     }
   }
 
@@ -216,7 +218,7 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     QTextStream out(&f);
     out << "id,fullName,licenseNo,phone\n";
     for (const auto& c : customers) {
-      out << c.id << "," << c.fullName << "," << c.licenseNo << "," << c.phone << "\n";
+      out << CsvUtils::makeRow(c.id, c.fullName, c.licenseNo, c.phone);
     }
   }
 
@@ -228,8 +230,7 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     QTextStream out(&f);
     out << "id,customerId,vehicleId,startDate,endDate,status\n";
     for (const auto& r : reservations) {
-      out << r.id << "," << r.customerId << "," << r.vehicleId << ","
-          << r.start.toIso() << "," << r.end.toIso() << "," << r.status << "\n";
+      out << CsvUtils::makeRow(r.id, r.customerId, r.vehicleId, r.start.toIso(), r.end.toIso(), r.status);
     }
   }
 
@@ -241,8 +242,7 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     QTextStream out(&f);
     out << "id,reservationId,subtotal,vat,lateFee,damageFee,total\n";
     for (const auto& inv : invoices) {
-      out << inv.id << "," << inv.reservationId << "," << inv.subtotal << ","
-          << inv.vat << "," << inv.lateFee << "," << inv.damageFee << "," << inv.total << "\n";
+      out << CsvUtils::makeRow(inv.id, inv.reservationId, inv.subtotal, inv.vat, inv.lateFee, inv.damageFee, inv.total);
     }
   }
 }
@@ -282,6 +282,6 @@ void FileManager::saveUsers(const std::vector<UserAccount>& users) {
   QTextStream out(&f);
   out << "id,username,passwordHashHex,role,customerId\n";
   for (const auto& u : users) {
-    out << u.id << "," << u.username << "," << u.passwordHashHex << "," << u.role << "," << u.customerId << "\n";
+    out << CsvUtils::makeRow(u.id, u.username, u.passwordHashHex, u.role, u.customerId);
   }
 }

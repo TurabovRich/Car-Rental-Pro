@@ -99,7 +99,7 @@ AuthDialog::AuthDialog(AuthService* auth, QWidget* parent)
     m_regUser = new QLineEdit(card);
     m_regUser->setPlaceholderText("Choose a username");
     m_regPass = new QLineEdit(card);
-    m_regPass->setPlaceholderText("Choose a password");
+    m_regPass->setPlaceholderText("Min 8 chars, Aa1...");
     m_regPass->setEchoMode(QLineEdit::Password);
     m_regName = new QLineEdit(card);
     m_regName->setPlaceholderText("Full name");
@@ -113,6 +113,10 @@ AuthDialog::AuthDialog(AuthService* auth, QWidget* parent)
     form->addRow("Full name", m_regName);
     form->addRow("License", m_regLicense);
     form->addRow("Phone", m_regPhone);
+    auto* pwHelp = new QLabel("Password must include uppercase, lowercase, and a number.", card);
+    pwHelp->setWordWrap(true);
+    pwHelp->setStyleSheet("color: #666666;");
+    form->addRow("", pwHelp);
 
     auto* btnRow = new QHBoxLayout();
     btnRow->addStretch(1);

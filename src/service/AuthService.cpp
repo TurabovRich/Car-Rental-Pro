@@ -83,7 +83,7 @@ UserAccount AuthService::registerUser(const QString& username,
   if (!m_rental) throw ValidationException("Rental service not configured");
   QString u = username.trimmed();
   Validation::requireNonEmpty(u, "Username");
-  Validation::requireNonEmpty(password, "Password");
+  Validation::requirePassword(password);
   Validation::requireNonEmpty(fullName, "Full name");
   Validation::requireLicense(licenseNo);
   Validation::requirePhone(phone);

@@ -2,6 +2,7 @@
 #include <QString>
 #include <ostream>
 
+// Rental customer profile (separate from the login account in users.csv).
 class Customer {
 public:
   int id{0};

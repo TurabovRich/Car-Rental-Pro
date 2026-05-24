@@ -9,12 +9,13 @@
 
 class FileManager;
 
+// Core business logic: fleet, customers, bookings, returns, invoices.
 class RentalService {
 public:
   explicit RentalService(FileManager* storage);
 
-  VehiclePtr findVehicle(int id) const;              // overloading
-  VehiclePtr findVehicle(const QString& plate) const; // overloading
+  VehiclePtr findVehicle(int id) const;
+  VehiclePtr findVehicle(const QString& plate) const;
   std::optional<Customer> findCustomer(int id) const;
 
   const std::vector<VehiclePtr>& vehicles() const { return m_vehicles; }

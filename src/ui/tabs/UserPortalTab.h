@@ -12,14 +12,7 @@ class QSortFilterProxyModel;
 class QStandardItemModel;
 class QTableView;
 
-/**
- * User-facing "rent a car" tab.
- *
- * UX / security constraints:
- * - In normal user mode, the customer is fixed (`lockedCustomerId`) and must not be switchable.
- * - Vehicle IDs are internal; the table hides them and stores the ID in `Qt::UserRole`.
- * - Car list is filtered by the currently selected date range to avoid showing unavailable cars.
- */
+// User tab: pick dates, see available cars, reserve one.
 class UserPortalTab : public QWidget {
   Q_OBJECT
 public:
@@ -41,7 +34,7 @@ private:
   RentalService* m_service{nullptr};
   int m_lockedCustomerId{0};
 
-  QComboBox* m_customer{nullptr}; // hidden/locked for normal users
+  QComboBox* m_customer{nullptr}; // hidden when lockedCustomerId is set
 
   QLineEdit* m_search{nullptr};
   QTableView* m_table{nullptr};
@@ -53,4 +46,3 @@ private:
   QLabel* m_pricePreview{nullptr};
   QPushButton* m_reserveBtn{nullptr};
 };
-

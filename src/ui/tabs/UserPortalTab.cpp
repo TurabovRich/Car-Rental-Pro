@@ -22,7 +22,7 @@ UserPortalTab::UserPortalTab(RentalService* service, int lockedCustomerId, QWidg
   root->setContentsMargins(12, 12, 12, 12);
   root->setSpacing(10);
 
-  // Customer selector is only useful for admin demos; normal users have a locked customerId.
+  // Regular users always book under their own customer id.
   m_customer = new QComboBox(this);
   m_customer->setVisible(false);
 

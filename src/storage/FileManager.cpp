@@ -1,3 +1,4 @@
+// CSV persistence for cars, customers, reservations, invoices, and users.
 #include "storage/FileManager.h"
 #include "domain/Vehicles.h"
 #include "utils/Exceptions.h"
@@ -32,7 +33,7 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
       throw FileException("Cannot open " + carsPath().toStdString());
     QTextStream in(&f);
 
-    // Read header to detect schema (supports both legacy and image-first formats)
+    // Older files put image in the first column; newer ones start with id.
     QString headerLine;
     if (in.atEnd()) return;
     headerLine = in.readLine().trimmed();
@@ -45,7 +46,7 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
       if (line.isEmpty()) continue;
       auto cols = splitCsvLine(line);
 
-      // Trim every column to be robust to spaces in CSV
+      // Ignore stray spaces around commas.
       for (auto& c : cols) c = c.trimmed();
 
       VehiclePtr v;

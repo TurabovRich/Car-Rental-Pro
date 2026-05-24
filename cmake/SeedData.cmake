@@ -1,3 +1,6 @@
+# Copy seed CSV files into the build output on first compile.
+# Existing files in build/data are left alone so user edits are not wiped.
+
 if(NOT DEFINED src OR NOT DEFINED dst)
   message(FATAL_ERROR "SeedData.cmake requires -Dsrc=... -Ddst=...")
 endif()
@@ -12,15 +15,12 @@ function(copy_if_missing relpath)
   endif()
 endfunction()
 
-# Seed CSV files only if missing
 copy_if_missing("cars.csv")
 copy_if_missing("customers.csv")
 copy_if_missing("reservations.csv")
 copy_if_missing("invoices.csv")
 copy_if_missing("users.csv")
 
-# Seed images folder only if missing (do not overwrite user-added images)
 if(EXISTS "${src}/images" AND NOT EXISTS "${dst}/images")
   file(COPY "${src}/images" DESTINATION "${dst}")
 endif()
-

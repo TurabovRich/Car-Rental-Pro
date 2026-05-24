@@ -46,6 +46,7 @@ bool AuthService::usernameTaken(const QString& username) const {
 }
 
 void AuthService::ensureDefaultAdmin() {
+  // First-run helper so the app is usable without manual CSV editing.
   bool hasAdmin = false;
   for (const auto& u : m_users) {
     if (u.role.compare("Admin", Qt::CaseInsensitive) == 0) { hasAdmin = true; break; }
@@ -89,6 +90,7 @@ UserAccount AuthService::registerUser(const QString& username,
   Validation::requirePhone(phone);
   if (usernameTaken(u)) throw ValidationException("Username already taken");
 
+  // Every user account needs a customer profile for bookings.
   int customerId = nextCustomerId();
   m_rental->addCustomer(Customer(customerId, fullName.trimmed(), licenseNo.trimmed(), phone.trimmed()));
 

@@ -5,8 +5,7 @@
 
 namespace CsvUtils {
 
-// Compile-time polymorphism via templates:
-// one generic API, specialized behavior per type.
+// Small helpers for building CSV lines (template specializations pick the right format).
 template <typename T>
 QString toCell(const T& value) {
   return QString::number(value);
@@ -29,4 +28,3 @@ QString makeRow(const Args&... args) {
 }
 
 } // namespace CsvUtils
-

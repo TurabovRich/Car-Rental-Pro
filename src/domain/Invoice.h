@@ -1,5 +1,6 @@
 #pragma once
 
+// Billing record created when a reservation is returned.
 class Invoice {
 public:
   int id{0};

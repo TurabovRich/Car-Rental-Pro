@@ -7,14 +7,7 @@ class QLineEdit;
 class QLabel;
 class QPushButton;
 
-/**
- * User-facing profile editor for the linked `Customer`.
- *
- * Persistence:
- * - Updates are written to `customers.csv` via `RentalService::updateCustomer(...)`.
- *
- * This does NOT edit login credentials (username/password), only the customer profile fields.
- */
+// Edit name, license, and phone for the logged-in customer.
 class UserProfileTab : public QWidget {
   Q_OBJECT
 public:
@@ -36,4 +29,3 @@ private:
   QLineEdit* m_phone{nullptr};
   QPushButton* m_save{nullptr};
 };
-

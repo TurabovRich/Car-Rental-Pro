@@ -1,47 +1,39 @@
-# CarRentalPro (Qt Widgets, C++17)
+# CarRentalPro
 
-A small local-first car rental demo app with two experiences:
-- **Admin panel**: cars/customers CRUD, reservations/returns, reports
-- **User app**: browse available cars by date range, reserve, return, profile, history
+Desktop car rental app built with **Qt Widgets** and **C++17**.
 
-## Docs
+- **Admin** — cars, customers, reservations, returns, revenue report  
+- **User** — search available cars, reserve, return, profile, rental history  
 
-Start here: `docs/ARCHITECTURE.md`
-Course mapping: `docs/OOP_REQUIREMENTS_MAP.md`
-Presentation guide: `docs/PRESENTATION_PACK.md`
+All records are saved as CSV files in a `data/` folder (created next to the built binary on first run).
 
-## Persistence (local)
+## Default admin account
 
-All data is stored as CSV files inside a `data/` directory (next to the built binary, or `./data` in dev):
-- `cars.csv`
-- `customers.csv`
-- `reservations.csv`
-- `invoices.csv`
-- `users.csv` (accounts)
+| Field    | Value  |
+|----------|--------|
+| Username | `admin` |
+| Password | `admin` |
 
-Important: `users.csv` stores **password hashes** (`SHA-256` hex), not raw passwords.
+On first launch the app creates this account if no admin exists yet.  
+User registration adds a row to `customers.csv` and a linked account in `users.csv` (passwords stored as SHA-256 hex, not plain text).
 
-## Authentication
+## Data files
 
-- On first run, the app ensures a default admin exists:
-  - username: `admin`
-  - password: `admin`
-- Registering a normal user creates:
-  - a `Customer` record in `customers.csv`
-  - a `UserAccount` record in `users.csv` linked via `customerId`
+| File              | Contents                          |
+|-------------------|-----------------------------------|
+| `cars.csv`        | Fleet                             |
+| `customers.csv`   | Customer profiles                 |
+| `reservations.csv`| Bookings                          |
+| `invoices.csv`    | Charges after a return            |
+| `users.csv`       | Login accounts                    |
 
-## Build
+## Build and run
+
 ```bash
-mkdir build && cd build
+mkdir -p build && cd build
 cmake ..
-cmake --build . --config Release
-```
-Run `CarRentalPro`. It loads/saves CSV automatically.
-
-## Run
-```bash 
-mkdir build
-cd build
-cmake ..
-make
+cmake --build .
 ./CarRentalPro
+```
+
+Requires **CMake 3.16+** and **Qt 5 or 6** with the Widgets module.

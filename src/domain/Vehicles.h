@@ -1,7 +1,7 @@
 #pragma once
 #include "domain/Vehicle.h"
 
-// Interface used to demonstrate multiple inheritance with Vehicle types.
+// Extra interface for types that include insurance pricing.
 class Insurable {
 public:
   virtual ~Insurable() = default;
@@ -36,8 +36,7 @@ public:
   double dailyRate() const override { return basePrice * 1.10; }
 };
 
-// Multiple inheritance example:
-// PremiumSUV is-a SUV and is-a Insurable.
+// Inherits SUV pricing and adds an insurance multiplier on top.
 class PremiumSUV : public SUV, public Insurable {
 public:
   using SUV::SUV;

@@ -1,6 +1,7 @@
 #pragma once
 #include <QString>
 
+// Shared input checks for dialogs and services.
 class Validation {
 public:
   static void requireNonEmpty(const QString& s, const char* fieldName);

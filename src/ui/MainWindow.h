@@ -15,19 +15,12 @@ class UserProfileTab;
 class MyRentalsTab;
 class UserHistoryTab;
 
+// Main shell: admin tabs or user tabs depending on who logged in.
 class MainWindow : public QMainWindow {
   Q_OBJECT
 public:
   enum class Mode { Admin, User };
-  /**
-   * Main application window.
-   *
-   * The same window class is used for two distinct experiences:
-   * - Admin mode: full CRUD + reports.
-   * - User mode: restricted UI for a single customer (`customerId`) and a visible username.
-   *
-   * Logout is implemented by emitting `logoutRequested()`; `main.cpp` listens and restarts the auth dialog.
-   */
+
   explicit MainWindow(RentalService* service,
                       Mode mode,
                       int customerId,

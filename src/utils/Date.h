@@ -1,6 +1,7 @@
 #pragma once
 #include <QString>
 
+// Simple calendar date used in reservations (stored as YYYY-MM-DD in CSV).
 class Date {
 public:
   int y{1970}, m{1}, d{1};

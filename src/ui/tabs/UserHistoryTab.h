@@ -8,15 +8,7 @@ class QTableView;
 class QTabWidget;
 class QLabel;
 
-/**
- * User-facing history screen.
- *
- * Shows a single customer's:
- * - Reservations (active + returned)
- * - Invoices generated from returns
- *
- * The customer scope is fixed by `customerId` (provided by the logged-in account).
- */
+// Past reservations and invoices for one customer.
 class UserHistoryTab : public QWidget {
   Q_OBJECT
 public:
@@ -40,4 +32,3 @@ private:
   QTableView* m_invTable{nullptr};
   QStandardItemModel* m_invModel{nullptr};
 };
-

@@ -12,9 +12,8 @@
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
   Theme::apply(app);
-  // We keep the process alive across sessions:
-  // - Close user/admin window -> either re-open login (logout) or exit the app.
-  // This avoids relaunching the process just to "log out".
+
+  // Keep the process running after the main window closes so logout can show login again.
   app.setQuitOnLastWindowClosed(false);
 
   QString dataDir = QDir(QCoreApplication::applicationDirPath()).filePath("data");
@@ -37,11 +36,7 @@ int main(int argc, char *argv[]) {
     QMessageBox::warning(nullptr, "Auth warning", QString("Could not load users: ") + e.what());
   }
 
-  // "Session loop":
-  // - Show auth dialog
-  // - Open the appropriate main window (admin vs user)
-  // - If user clicks Logout -> close window and restart auth dialog
-  // - If user closes window normally -> exit application
+  // Login loop: show auth dialog, open admin or user window, repeat on logout.
   bool loggedOut = false;
   while (true) {
     loggedOut = false;
@@ -60,7 +55,6 @@ int main(int argc, char *argv[]) {
     });
 
     QEventLoop loop;
-    // `MainWindow` emits `sessionEnded()` from `closeEvent`, which is used to stop this inner loop.
     QObject::connect(w, &MainWindow::sessionEnded, &loop, &QEventLoop::quit);
     w->show();
     loop.exec();
@@ -69,9 +63,7 @@ int main(int argc, char *argv[]) {
     if (!loggedOut) break;
   }
 
-  int code = 0;
-
   try { service.save(); } catch (...) {}
   try { auth.save(); } catch (...) {}
-  return code;
+  return 0;
 }

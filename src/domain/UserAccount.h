@@ -2,19 +2,11 @@
 
 #include <QString>
 
-/**
- * Represents an application login account persisted in `data/users.csv`.
- *
- * Notes:
- * - `passwordHashHex` stores a SHA-256 hex digest of the password (never the raw password).
- * - Normal users are linked to exactly one `Customer` through `customerId`.
- * - Admin accounts do not need a linked customer (`customerId == 0`).
- */
+// One login row in users.csv. Normal users point at a customer via customerId.
 struct UserAccount {
   int id{0};
   QString username;
-  QString passwordHashHex; // SHA-256 hex digest of password
+  QString passwordHashHex; // SHA-256 hex, never the raw password
   QString role;            // "Admin" or "User"
-  int customerId{0};       // for role=="User", links to Customer.id
+  int customerId{0};       // 0 for admin; otherwise links to Customer.id
 };
-

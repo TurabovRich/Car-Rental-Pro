@@ -12,7 +12,6 @@ class QSortFilterProxyModel;
 class QStandardItemModel;
 class QTableView;
 
-// User tab: pick dates, see available cars, reserve one.
 class UserPortalTab : public QWidget {
   Q_OBJECT
 public:
@@ -34,8 +33,7 @@ private:
   RentalService* m_service{nullptr};
   int m_lockedCustomerId{0};
 
-  QComboBox* m_customer{nullptr}; // hidden when lockedCustomerId is set
-
+  QComboBox* m_customer{nullptr};
   QLineEdit* m_search{nullptr};
   QTableView* m_table{nullptr};
   QStandardItemModel* m_model{nullptr};

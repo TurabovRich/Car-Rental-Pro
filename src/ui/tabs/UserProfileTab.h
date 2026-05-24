@@ -7,7 +7,6 @@ class QLineEdit;
 class QLabel;
 class QPushButton;
 
-// Edit name, license, and phone for the logged-in customer.
 class UserProfileTab : public QWidget {
   Q_OBJECT
 public:

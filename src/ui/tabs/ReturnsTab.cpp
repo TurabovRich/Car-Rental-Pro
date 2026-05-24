@@ -44,7 +44,7 @@ void ReturnsTab::refresh() {
     if (r.status != "Returned") continue;
 
     QString customerName = QString::number(r.customerId);
-    if (auto c = m_service->findCustomer(r.customerId); c.has_value()) customerName = c->fullName;
+    if (const Customer* c = m_service->findCustomer(r.customerId)) customerName = c->fullName;
 
     QString vehicleName = QString::number(r.vehicleId);
     QString plate = "-";

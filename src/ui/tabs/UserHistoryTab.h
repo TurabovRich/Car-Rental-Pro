@@ -8,7 +8,6 @@ class QTableView;
 class QTabWidget;
 class QLabel;
 
-// Past reservations and invoices for one customer.
 class UserHistoryTab : public QWidget {
   Q_OBJECT
 public:

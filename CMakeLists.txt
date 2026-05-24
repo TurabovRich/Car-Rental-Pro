@@ -7,13 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 COMPONENTS Widgets QUIET)
-if (Qt6_FOUND)
-  set(QT_LIBS Qt6::Widgets)
-else()
-  find_package(Qt5 COMPONENTS Widgets REQUIRED)
-  set(QT_LIBS Qt5::Widgets)
-endif()
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 add_executable(CarRentalPro
   src/main.cpp
@@ -48,10 +42,9 @@ add_executable(CarRentalPro
 )
 
 target_include_directories(CarRentalPro PRIVATE src)
-target_link_libraries(CarRentalPro PRIVATE ${QT_LIBS})
+target_link_libraries(CarRentalPro PRIVATE Qt6::Widgets)
 
 add_custom_command(TARGET CarRentalPro POST_BUILD
-  # Copy data/*.csv into build/data on first build only
   COMMAND ${CMAKE_COMMAND}
     -Dsrc=${CMAKE_SOURCE_DIR}/data
     -Ddst=$<TARGET_FILE_DIR:CarRentalPro>/data

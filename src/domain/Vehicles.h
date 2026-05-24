@@ -1,13 +1,6 @@
 #pragma once
 #include "domain/Vehicle.h"
 
-// Extra interface for types that include insurance pricing.
-class Insurable {
-public:
-  virtual ~Insurable() = default;
-  virtual double insuranceMultiplier() const = 0;
-};
-
 class Sedan : public Vehicle {
 public:
   using Vehicle::Vehicle;
@@ -36,11 +29,9 @@ public:
   double dailyRate() const override { return basePrice * 1.10; }
 };
 
-// Inherits SUV pricing and adds an insurance multiplier on top.
-class PremiumSUV : public SUV, public Insurable {
+class PremiumSUV : public SUV {
 public:
   using SUV::SUV;
   QString type() const override { return "PremiumSUV"; }
-  double insuranceMultiplier() const override { return 1.20; }
-  double dailyRate() const override { return SUV::dailyRate() * insuranceMultiplier(); }
+  double dailyRate() const override { return SUV::dailyRate() * 1.20; }
 };

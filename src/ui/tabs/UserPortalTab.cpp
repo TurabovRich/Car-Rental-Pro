@@ -22,7 +22,6 @@ UserPortalTab::UserPortalTab(RentalService* service, int lockedCustomerId, QWidg
   root->setContentsMargins(12, 12, 12, 12);
   root->setSpacing(10);
 
-  // Regular users always book under their own customer id.
   m_customer = new QComboBox(this);
   m_customer->setVisible(false);
 
@@ -234,14 +233,11 @@ void UserPortalTab::onReserveSelected() {
 
     refresh();
 
-    // "Receipt": this is the only confirmation users get in a local-only app.
-    // We also show the local save directory to make it explicit where data is stored.
-    QMessageBox::information(this, "Reservation receipt",
+    QMessageBox::information(this, "Reserved",
                              "Reservation #" + QString::number(r.id) + "\n"
-                             "Car: " + carLine + "\n"
-                             "Dates: " + s.toIso() + " → " + e.toIso() + " (" + QString::number(days) + " day(s))\n"
-                             "Estimated total: $" + QString::number(subtotal, 'f', 2) + "\n\n"
-                             "Saved locally in: " + m_service->dataDir());
+                             + carLine + "\n"
+                             + s.toIso() + " - " + e.toIso() + "\n"
+                             + QString::number(days) + " days, about $" + QString::number(subtotal, 'f', 2));
   } catch (const std::exception& e) {
     QMessageBox::critical(this, "Error", e.what());
   }

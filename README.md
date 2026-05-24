@@ -1,39 +1,21 @@
 # CarRentalPro
 
-Desktop car rental app built with **Qt Widgets** and **C++17**.
+Qt Widgets app for a car rental shop (C++17).
 
-- **Admin** — cars, customers, reservations, returns, revenue report  
-- **User** — search available cars, reserve, return, profile, rental history  
+Admin can manage cars, customers, bookings and returns.  
+Users can register, log in, rent a car and see their history.
 
-All records are saved as CSV files in a `data/` folder (created next to the built binary on first run).
+Data is stored in CSV files in the `data` folder (next to the executable after build).
 
-## Default admin account
+Default admin login: **admin** / **admin**
 
-| Field    | Value  |
-|----------|--------|
-| Username | `admin` |
-| Password | `admin` |
-
-On first launch the app creates this account if no admin exists yet.  
-User registration adds a row to `customers.csv` and a linked account in `users.csv` (passwords stored as SHA-256 hex, not plain text).
-
-## Data files
-
-| File              | Contents                          |
-|-------------------|-----------------------------------|
-| `cars.csv`        | Fleet                             |
-| `customers.csv`   | Customer profiles                 |
-| `reservations.csv`| Bookings                          |
-| `invoices.csv`    | Charges after a return            |
-| `users.csv`       | Login accounts                    |
-
-## Build and run
+## Build
 
 ```bash
-mkdir -p build && cd build
+mkdir build && cd build
 cmake ..
-cmake --build .
+make
 ./CarRentalPro
 ```
 
-Requires **CMake 3.16+** and **Qt 5 or 6** with the Widgets module.
+Need Qt 6 with Widgets module.

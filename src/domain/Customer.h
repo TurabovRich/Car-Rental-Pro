@@ -2,7 +2,6 @@
 #include <QString>
 #include <ostream>
 
-// Rental customer profile (separate from the login account in users.csv).
 class Customer {
 public:
   int id{0};
@@ -16,8 +15,7 @@ public:
 
   bool operator==(const Customer& other) const { return id == other.id; }
   friend std::ostream& operator<<(std::ostream& os, const Customer& c) {
-    os << c.id << " " << c.fullName.toStdString() << " " << c.licenseNo.toStdString()
-       << " " << c.phone.toStdString();
+    os << c.id << " " << c.fullName.toStdString();
     return os;
   }
 };

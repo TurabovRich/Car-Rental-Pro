@@ -1,15 +1,21 @@
-// CSV persistence for cars, customers, reservations, invoices, and users.
 #include "storage/FileManager.h"
 #include "domain/Vehicles.h"
 #include "utils/Exceptions.h"
 #include "utils/Date.h"
-#include "utils/CsvUtils.h"
-#include <QDir>
 #include <QFile>
 #include <QTextStream>
 
 static QStringList splitCsvLine(const QString& line) {
   return line.split(",", Qt::KeepEmptyParts);
+}
+
+static VehiclePtr makeVehicle(const QString& type, int id, const QString& brand, const QString& model,
+                              int year, const QString& plate, double basePrice, bool avail) {
+  if (type == "SUV") return std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
+  if (type == "Truck") return std::make_shared<Truck>(id, brand, model, year, plate, basePrice, avail);
+  if (type == "Electric") return std::make_shared<Electric>(id, brand, model, year, plate, basePrice, avail);
+  if (type == "PremiumSUV") return std::make_shared<PremiumSUV>(id, brand, model, year, plate, basePrice, avail);
+  return std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
 }
 
 FileManager::FileManager(QString dataDir) : m_dataDir(std::move(dataDir)) {}
@@ -26,107 +32,34 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
                           std::vector<Invoice>& invoices) {
   vehicles.clear(); customers.clear(); reservations.clear(); invoices.clear();
 
-  // Cars
   {
     QFile f(carsPath());
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
       throw FileException("Cannot open " + carsPath().toStdString());
     QTextStream in(&f);
-
-    // Older files put image in the first column; newer ones start with id.
-    QString headerLine;
-    if (in.atEnd()) return;
-    headerLine = in.readLine().trimmed();
-    auto headerCols = splitCsvLine(headerLine);
-    bool imageFirst = !headerCols.isEmpty() &&
-                      headerCols[0].trimmed().compare("image", Qt::CaseInsensitive) == 0;
-
+    bool first = true;
     while (!in.atEnd()) {
       QString line = in.readLine().trimmed();
       if (line.isEmpty()) continue;
+      if (first) { first = false; continue; }
       auto cols = splitCsvLine(line);
+      if (cols.size() < 8) continue;
 
-      // Ignore stray spaces around commas.
-      for (auto& c : cols) c = c.trimmed();
+      int id = cols[0].toInt();
+      QString type = cols[1];
+      QString brand = cols[2];
+      QString model = cols[3];
+      int year = cols[4].toInt();
+      QString plate = cols[5];
+      double basePrice = cols[6].toDouble();
+      bool avail = (cols[7].toLower() == "true");
 
-      VehiclePtr v;
-
-      if (imageFirst) {
-        // Format: image,id,type,brand,model,year,plate,basePrice,available
-        if (cols.size() < 9) continue;
-
-        QString imageFile = cols[0];
-        int id = cols[1].toInt();
-        QString type = cols[2];
-        QString brand = cols[3];
-        QString model = cols[4];
-        int year = cols[5].toInt();
-        QString plate = cols[6];
-        double basePrice = cols[7].toDouble();
-        bool avail = (cols[8].toLower() == "true");
-
-        if (type == "Sedan") v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "SUV") v = std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "Truck") v = std::make_shared<Truck>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "Electric") v = std::make_shared<Electric>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "PremiumSUV") v = std::make_shared<PremiumSUV>(id, brand, model, year, plate, basePrice, avail);
-        else v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
-
-        if (v) {
-          if (!imageFile.isEmpty()) {
-            // If user only provided filename, assume it's inside "images" folder under data dir
-            if (imageFile.contains('/'))
-              v->imagePath = imageFile;
-            else
-              v->imagePath = "images/" + imageFile;
-          }
-        }
-      } else {
-        // Legacy format: id,type,brand,model,year,plate,basePrice,available[,imagePath]
-        if (cols.size() < 8) continue;
-
-        int id = cols[0].toInt();
-        QString type = cols[1];
-        QString brand = cols[2];
-        QString model = cols[3];
-        int year = cols[4].toInt();
-        QString plate = cols[5];
-        double basePrice = cols[6].toDouble();
-        bool avail = (cols[7].toLower() == "true");
-        QString imagePath = (cols.size() >= 9) ? cols[8] : QString();
-
-        if (type == "Sedan") v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "SUV") v = std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "Truck") v = std::make_shared<Truck>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "Electric") v = std::make_shared<Electric>(id, brand, model, year, plate, basePrice, avail);
-        else if (type == "PremiumSUV") v = std::make_shared<PremiumSUV>(id, brand, model, year, plate, basePrice, avail);
-        else v = std::make_shared<Sedan>(id, brand, model, year, plate, basePrice, avail);
-
-        if (v) v->imagePath = imagePath;
-      }
-
-      // Auto-link image by plate if not provided in CSV
-      if (v && v->imagePath.trimmed().isEmpty()) {
-        QDir imagesDir(m_dataDir + "/images");
-        if (imagesDir.exists()) {
-          const QString base = v->plate.trimmed();
-          if (!base.isEmpty()) {
-            const QStringList filters = {
-              base + ".png", base + ".jpg", base + ".jpeg", base + ".webp", base + ".bmp"
-            };
-            const QStringList matches = imagesDir.entryList(filters, QDir::Files);
-            if (!matches.isEmpty()) {
-              v->imagePath = "images/" + matches.first();
-            }
-          }
-        }
-      }
-
-      if (v) vehicles.push_back(v);
+      VehiclePtr v = makeVehicle(type, id, brand, model, year, plate, basePrice, avail);
+      if (cols.size() >= 9) v->imagePath = cols[8];
+      vehicles.push_back(v);
     }
   }
 
-  // Customers
   {
     QFile f(customersPath());
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -143,7 +76,6 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
     }
   }
 
-  // Reservations
   {
     QFile f(reservationsPath());
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -167,7 +99,6 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
     }
   }
 
-  // Invoices
   {
     QFile f(invoicesPath());
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -197,7 +128,6 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
                           const std::vector<Customer>& customers,
                           const std::vector<Reservation>& reservations,
                           const std::vector<Invoice>& invoices) {
-  // Cars
   {
     QFile f(carsPath());
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -206,12 +136,12 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     out << "id,type,brand,model,year,plate,basePrice,available,imagePath\n";
     for (const auto& v : vehicles) {
       if (!v) continue;
-      out << CsvUtils::makeRow(v->id, v->type(), v->brand, v->model, v->year, v->plate,
-                               v->basePrice, (v->available ? "true" : "false"), v->imagePath);
+      out << v->id << "," << v->type() << "," << v->brand << "," << v->model << ","
+          << v->year << "," << v->plate << "," << v->basePrice << ","
+          << (v->available ? "true" : "false") << "," << v->imagePath << "\n";
     }
   }
 
-  // Customers
   {
     QFile f(customersPath());
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -219,11 +149,10 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     QTextStream out(&f);
     out << "id,fullName,licenseNo,phone\n";
     for (const auto& c : customers) {
-      out << CsvUtils::makeRow(c.id, c.fullName, c.licenseNo, c.phone);
+      out << c.id << "," << c.fullName << "," << c.licenseNo << "," << c.phone << "\n";
     }
   }
 
-  // Reservations
   {
     QFile f(reservationsPath());
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -231,11 +160,11 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     QTextStream out(&f);
     out << "id,customerId,vehicleId,startDate,endDate,status\n";
     for (const auto& r : reservations) {
-      out << CsvUtils::makeRow(r.id, r.customerId, r.vehicleId, r.start.toIso(), r.end.toIso(), r.status);
+      out << r.id << "," << r.customerId << "," << r.vehicleId << ","
+          << r.start.toIso() << "," << r.end.toIso() << "," << r.status << "\n";
     }
   }
 
-  // Invoices
   {
     QFile f(invoicesPath());
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -243,7 +172,8 @@ void FileManager::saveAll(const std::vector<VehiclePtr>& vehicles,
     QTextStream out(&f);
     out << "id,reservationId,subtotal,vat,lateFee,damageFee,total\n";
     for (const auto& inv : invoices) {
-      out << CsvUtils::makeRow(inv.id, inv.reservationId, inv.subtotal, inv.vat, inv.lateFee, inv.damageFee, inv.total);
+      out << inv.id << "," << inv.reservationId << "," << inv.subtotal << ","
+          << inv.vat << "," << inv.lateFee << "," << inv.damageFee << "," << inv.total << "\n";
     }
   }
 }
@@ -252,7 +182,7 @@ void FileManager::loadUsers(std::vector<UserAccount>& users) {
   users.clear();
 
   QFile f(usersPath());
-  if (!f.exists()) return; // first run: no users yet
+  if (!f.exists()) return;
   if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
     throw FileException("Cannot open " + usersPath().toStdString());
 
@@ -263,7 +193,6 @@ void FileManager::loadUsers(std::vector<UserAccount>& users) {
     if (line.isEmpty()) continue;
     if (first) { first = false; continue; }
     auto cols = splitCsvLine(line);
-    for (auto& c : cols) c = c.trimmed();
     if (cols.size() < 4) continue;
 
     UserAccount u;
@@ -283,6 +212,7 @@ void FileManager::saveUsers(const std::vector<UserAccount>& users) {
   QTextStream out(&f);
   out << "id,username,passwordHashHex,role,customerId\n";
   for (const auto& u : users) {
-    out << CsvUtils::makeRow(u.id, u.username, u.passwordHashHex, u.role, u.customerId);
+    out << u.id << "," << u.username << "," << u.passwordHashHex << ","
+        << u.role << "," << u.customerId << "\n";
   }
 }

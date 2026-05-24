@@ -15,7 +15,7 @@
 static QString reservationLabel(const RentalService* service, const Reservation& r) {
   if (!service) return "Reservation " + QString::number(r.id);
   QString customerName = QString::number(r.customerId);
-  if (auto c = service->findCustomer(r.customerId); c.has_value()) customerName = c->fullName;
+  if (const Customer* c = service->findCustomer(r.customerId)) customerName = c->fullName;
 
   QString carLabel = QString::number(r.vehicleId);
   if (auto v = service->findVehicle(r.vehicleId); v) {
@@ -91,7 +91,7 @@ void ReturnDialog::recomputePreview() {
     if (!rptr) { m_details->setText("Reservation not found"); return; }
 
     QString customerName = QString::number(rptr->customerId);
-    if (auto c = m_service->findCustomer(rptr->customerId); c.has_value()) customerName = c->fullName;
+    if (const Customer* c = m_service->findCustomer(rptr->customerId)) customerName = c->fullName;
 
     auto v = m_service->findVehicle(rptr->vehicleId);
     QString carLine = "Vehicle: " + QString::number(rptr->vehicleId);

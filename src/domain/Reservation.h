@@ -4,14 +4,14 @@
 
 class Reservation {
 public:
-  static int nextId; // bumped when loading from CSV so new IDs stay unique
+  static int nextId;
 
   int id{0};
   int customerId{0};
   int vehicleId{0};
   Date start;
   Date end;
-  QString status{"Active"}; // Active or Returned
+  QString status{"Active"};
 
   Reservation() = default;
   Reservation(int customerId_, int vehicleId_, Date start_, Date end_)

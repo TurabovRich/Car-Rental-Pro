@@ -29,7 +29,6 @@ MainWindow::MainWindow(RentalService* service,
   setWindowTitle((m_mode == Mode::Admin) ? "CarRentalPro — Admin" : ("CarRentalPro — " + m_username));
   resize(1000, 650);
 
-  // Header row: app title, username, logout button.
   auto* root = new QWidget(this);
   auto* rootLayout = new QVBoxLayout(root);
   rootLayout->setContentsMargins(10, 10, 10, 10);
@@ -56,7 +55,6 @@ MainWindow::MainWindow(RentalService* service,
 
   connect(m_logoutBtn, &QPushButton::clicked, this, &MainWindow::logoutRequested);
 
-  // Build a different set of tabs for admin vs normal user.
   m_tabs = new QTabWidget(root);
 
   if (m_mode == Mode::Admin) {
@@ -102,6 +100,5 @@ MainWindow::MainWindow(RentalService* service,
 
 void MainWindow::closeEvent(QCloseEvent* event) {
   QMainWindow::closeEvent(event);
-  // Lets main.cpp know the window closed (logout or quit).
   emit sessionEnded();
 }

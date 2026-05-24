@@ -46,7 +46,6 @@ bool AuthService::usernameTaken(const QString& username) const {
 }
 
 void AuthService::ensureDefaultAdmin() {
-  // First-run helper so the app is usable without manual CSV editing.
   bool hasAdmin = false;
   for (const auto& u : m_users) {
     if (u.role.compare("Admin", Qt::CaseInsensitive) == 0) { hasAdmin = true; break; }
@@ -63,17 +62,18 @@ void AuthService::ensureDefaultAdmin() {
   save();
 }
 
-std::optional<UserAccount> AuthService::login(const QString& username, const QString& password) const {
+bool AuthService::login(const QString& username, const QString& password, UserAccount& out) const {
   QString u = username.trimmed();
-  if (u.isEmpty()) return std::nullopt;
+  if (u.isEmpty()) return false;
   QString want = hashPasswordHex(password);
   for (const auto& acc : m_users) {
     if (acc.username.compare(u, Qt::CaseInsensitive) == 0 &&
         acc.passwordHashHex.compare(want, Qt::CaseInsensitive) == 0) {
-      return acc;
+      out = acc;
+      return true;
     }
   }
-  return std::nullopt;
+  return false;
 }
 
 UserAccount AuthService::registerUser(const QString& username,
@@ -90,7 +90,6 @@ UserAccount AuthService::registerUser(const QString& username,
   Validation::requirePhone(phone);
   if (usernameTaken(u)) throw ValidationException("Username already taken");
 
-  // Every user account needs a customer profile for bookings.
   int customerId = nextCustomerId();
   m_rental->addCustomer(Customer(customerId, fullName.trimmed(), licenseNo.trimmed(), phone.trimmed()));
 
@@ -104,4 +103,3 @@ UserAccount AuthService::registerUser(const QString& username,
   save();
   return acc;
 }
-

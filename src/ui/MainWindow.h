@@ -15,7 +15,6 @@ class UserProfileTab;
 class MyRentalsTab;
 class UserHistoryTab;
 
-// Main shell: admin tabs or user tabs depending on who logged in.
 class MainWindow : public QMainWindow {
   Q_OBJECT
 public:

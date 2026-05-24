@@ -114,7 +114,7 @@ void CustomerHistoryDialog::updateSummary() {
   QString name = QString::number(m_customerId);
   QString license;
   QString phone;
-  if (auto c = m_service->findCustomer(m_customerId); c.has_value()) {
+  if (const Customer* c = m_service->findCustomer(m_customerId)) {
     name = c->fullName;
     license = c->licenseNo;
     phone = c->phone;

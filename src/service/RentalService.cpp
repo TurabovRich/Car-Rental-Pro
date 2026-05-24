@@ -16,7 +16,6 @@ QString RentalService::dataDir() const {
 void RentalService::load() {
   if (!m_storage) throw FileException("Storage not configured");
   m_storage->loadAll(m_vehicles, m_customers, m_reservations, m_invoices);
-  // Keep auto-generated reservation ids above anything already on disk.
   int maxId = 0;
   for (const auto& r : m_reservations) maxId = std::max(maxId, r.id);
   Reservation::nextId = maxId + 1;
@@ -37,9 +36,10 @@ VehiclePtr RentalService::findVehicle(const QString& plate) const {
   return nullptr;
 }
 
-std::optional<Customer> RentalService::findCustomer(int id) const {
-  for (const auto& c : m_customers) if (c.id == id) return c;
-  return std::nullopt;
+const Customer* RentalService::findCustomer(int id) const {
+  for (const auto& c : m_customers)
+    if (c.id == id) return &c;
+  return nullptr;
 }
 
 void RentalService::addVehicle(const VehiclePtr& v) {
@@ -81,7 +81,7 @@ void RentalService::deleteVehicle(int id) {
 }
 
 void RentalService::addCustomer(const Customer& c) {
-  if (findCustomer(c.id).has_value()) throw ValidationException("Customer ID already exists");
+  if (findCustomer(c.id)) throw ValidationException("Customer ID already exists");
   Validation::requireNonEmpty(c.fullName, "Full name");
   Validation::requireLicense(c.licenseNo);
   Validation::requirePhone(c.phone);
@@ -110,7 +110,6 @@ bool RentalService::isVehicleAvailableForRange(int vehicleId, const Date& start,
   auto v = findVehicle(vehicleId);
   if (!v) return false;
 
-  // Reject if any active booking overlaps the requested range.
   for (const auto& r : m_reservations) {
     if (r.vehicleId != vehicleId) continue;
     if (r.status != "Active") continue;
@@ -120,11 +119,11 @@ bool RentalService::isVehicleAvailableForRange(int vehicleId, const Date& start,
 }
 
 Reservation RentalService::createReservation(int customerId, int vehicleId, const Date& start, const Date& end) {
-  if (!findCustomer(customerId).has_value()) throw BookingException("Customer not found");
+  if (!findCustomer(customerId)) throw ValidationException("Customer not found");
   auto v = findVehicle(vehicleId);
-  if (!v) throw BookingException("Vehicle not found");
-  if (Date::daysBetween(start, end) <= 0) throw BookingException("End date must be after start date");
-  if (!isVehicleAvailableForRange(vehicleId, start, end)) throw BookingException("Vehicle is not available for these dates");
+  if (!v) throw ValidationException("Vehicle not found");
+  if (Date::daysBetween(start, end) <= 0) throw ValidationException("End date must be after start date");
+  if (!isVehicleAvailableForRange(vehicleId, start, end)) throw ValidationException("Vehicle is not available for these dates");
 
   Reservation r(customerId, vehicleId, start, end);
   m_reservations.push_back(r);
@@ -143,15 +142,15 @@ Invoice RentalService::processReturn(int reservationId, int lateDays, double dam
   if (damageFee < 0) throw ValidationException("Damage fee cannot be negative");
 
   auto it = std::find_if(m_reservations.begin(), m_reservations.end(), [&](const Reservation& r){ return r.id == reservationId; });
-  if (it == m_reservations.end()) throw BookingException("Reservation not found");
-  if (it->status != "Active") throw BookingException("Reservation already returned");
+  if (it == m_reservations.end()) throw ValidationException("Reservation not found");
+  if (it->status != "Active") throw ValidationException("Reservation already returned");
 
   auto v = findVehicle(it->vehicleId);
-  if (!v) throw BookingException("Vehicle not found for reservation");
+  if (!v) throw ValidationException("Vehicle not found for reservation");
 
   int days = Date::daysBetween(it->start, it->end);
   double subtotal = days * v->dailyRate();
-  double lateFee = lateDays * (v->dailyRate() * 1.5); // 150% of daily rate per late day
+  double lateFee = lateDays * (v->dailyRate() * 1.5);
 
   Invoice inv(nextInvoiceId(), reservationId, subtotal, lateFee, damageFee);
   m_invoices.push_back(inv);
@@ -163,8 +162,8 @@ Invoice RentalService::processReturn(int reservationId, int lateDays, double dam
 
 Invoice RentalService::processReturn(int reservationId, const Date& returnDate, double damageFee) {
   auto it = std::find_if(m_reservations.begin(), m_reservations.end(), [&](const Reservation& r){ return r.id == reservationId; });
-  if (it == m_reservations.end()) throw BookingException("Reservation not found");
-  if (it->status != "Active") throw BookingException("Reservation already returned");
+  if (it == m_reservations.end()) throw ValidationException("Reservation not found");
+  if (it->status != "Active") throw ValidationException("Reservation already returned");
 
   int lateDays = 0;
   if (it->end < returnDate) {
@@ -177,11 +176,11 @@ Invoice RentalService::previewReturn(int reservationId, const Date& returnDate, 
   if (damageFee < 0) throw ValidationException("Damage fee cannot be negative");
 
   auto it = std::find_if(m_reservations.begin(), m_reservations.end(), [&](const Reservation& r){ return r.id == reservationId; });
-  if (it == m_reservations.end()) throw BookingException("Reservation not found");
-  if (it->status != "Active") throw BookingException("Reservation already returned");
+  if (it == m_reservations.end()) throw ValidationException("Reservation not found");
+  if (it->status != "Active") throw ValidationException("Reservation already returned");
 
   auto v = findVehicle(it->vehicleId);
-  if (!v) throw BookingException("Vehicle not found for reservation");
+  if (!v) throw ValidationException("Vehicle not found for reservation");
 
   int lateDays = 0;
   if (it->end < returnDate) {
@@ -190,7 +189,7 @@ Invoice RentalService::previewReturn(int reservationId, const Date& returnDate, 
 
   int days = Date::daysBetween(it->start, it->end);
   double subtotal = days * v->dailyRate();
-  double lateFee = lateDays * (v->dailyRate() * 1.5); // 150% of daily rate per late day
+  double lateFee = lateDays * (v->dailyRate() * 1.5);
 
   return Invoice(0, reservationId, subtotal, lateFee, damageFee);
 }

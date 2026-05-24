@@ -7,7 +7,6 @@
 #include "domain/Invoice.h"
 #include "domain/UserAccount.h"
 
-// Reads and writes all CSV files under the data directory.
 class FileManager {
 public:
   explicit FileManager(QString dataDir);

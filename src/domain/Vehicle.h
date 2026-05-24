@@ -3,7 +3,6 @@
 #include <memory>
 #include <ostream>
 
-// Base class for all car types. Subclasses override type() and dailyRate().
 class Vehicle {
 public:
   int id{0};
@@ -13,7 +12,7 @@ public:
   QString plate;
   double basePrice{0.0};
   bool available{true};
-  QString imagePath; // relative to data/ (e.g. images/car.png) or absolute path
+  QString imagePath;
 
   Vehicle() = default;
   Vehicle(int id_, QString brand_, QString model_, int year_, QString plate_, double basePrice_, bool available_)
@@ -27,7 +26,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Vehicle& v) {
     os << v.id << " " << v.type().toStdString() << " " << v.brand.toStdString()
        << " " << v.model.toStdString() << " " << v.year << " " << v.plate.toStdString()
-       << " $" << v.basePrice << " avail=" << (v.available ? "true" : "false");
+       << " $" << v.basePrice;
     return os;
   }
 };

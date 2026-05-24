@@ -12,8 +12,6 @@
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
   Theme::apply(app);
-
-  // Keep the process running after the main window closes so logout can show login again.
   app.setQuitOnLastWindowClosed(false);
 
   QString dataDir = QDir(QCoreApplication::applicationDirPath()).filePath("data");
@@ -26,24 +24,23 @@ int main(int argc, char *argv[]) {
   try {
     service.load();
   } catch (const std::exception& e) {
-    QMessageBox::warning(nullptr, "Load warning", QString("Could not load data: ") + e.what());
+    QMessageBox::warning(nullptr, "Warning", e.what());
   }
 
   try {
     auth.load();
     auth.ensureDefaultAdmin();
   } catch (const std::exception& e) {
-    QMessageBox::warning(nullptr, "Auth warning", QString("Could not load users: ") + e.what());
+    QMessageBox::warning(nullptr, "Warning", e.what());
   }
 
-  // Login loop: show auth dialog, open admin or user window, repeat on logout.
   bool loggedOut = false;
   while (true) {
     loggedOut = false;
     AuthDialog login(&auth);
-    if (login.exec() != QDialog::Accepted || !login.authenticated().has_value()) break;
+    if (login.exec() != QDialog::Accepted || !login.ok()) break;
 
-    UserAccount acc = *login.authenticated();
+    UserAccount acc = login.account();
     MainWindow::Mode mode = (acc.role.compare("Admin", Qt::CaseInsensitive) == 0)
                               ? MainWindow::Mode::Admin
                               : MainWindow::Mode::User;

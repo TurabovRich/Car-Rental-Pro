@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <optional>
 #include <QString>
 
 #include "domain/UserAccount.h"
@@ -9,20 +8,16 @@
 class FileManager;
 class RentalService;
 
-// Handles login, registration, and users.csv persistence.
 class AuthService {
 public:
   AuthService(FileManager* storage, RentalService* rental);
 
   void load();
   void save();
-
-  // Creates admin/admin when the app has no admin account yet.
   void ensureDefaultAdmin();
 
-  std::optional<UserAccount> login(const QString& username, const QString& password) const;
+  bool login(const QString& username, const QString& password, UserAccount& out) const;
 
-  // Registers a normal user and creates the matching Customer row.
   UserAccount registerUser(const QString& username,
                            const QString& password,
                            const QString& fullName,

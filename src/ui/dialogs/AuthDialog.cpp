@@ -136,9 +136,9 @@ void AuthDialog::updateAdminHint() {
   if (!m_loginHint) return;
   const QString u = m_loginUser ? m_loginUser->text().trimmed() : QString();
   if (u.compare("admin", Qt::CaseInsensitive) == 0) {
-    m_loginHint->setText("Tip: default admin is username `admin` and password `admin` (change it by editing `data/users.csv`).");
+    m_loginHint->setText("Default admin password is also admin.");
   } else {
-    m_loginHint->setText("Admins will see the admin panel; normal users will see the rental app.");
+    m_loginHint->setText("");
   }
 }
 
@@ -147,12 +147,13 @@ void AuthDialog::onLogin() {
   try {
     const QString u = m_loginUser->text();
     const QString p = m_loginPass->text();
-    auto acc = m_auth->login(u, p);
-    if (!acc.has_value()) {
+    UserAccount acc;
+    if (!m_auth->login(u, p, acc)) {
       QMessageBox::warning(this, "Login failed", "Invalid username or password.");
       return;
     }
-    m_authenticated = *acc;
+    m_account = acc;
+    m_ok = true;
     accept();
   } catch (const std::exception& e) {
     QMessageBox::critical(this, "Error", e.what());

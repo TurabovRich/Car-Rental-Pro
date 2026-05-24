@@ -67,8 +67,8 @@ void UserProfileTab::refresh() {
     return;
   }
 
-  auto c = m_service->findCustomer(m_customerId);
-  if (!c.has_value()) {
+  const Customer* c = m_service->findCustomer(m_customerId);
+  if (!c) {
     m_header->setText("Profile (not found)");
     m_save->setEnabled(false);
     return;

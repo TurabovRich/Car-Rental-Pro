@@ -11,7 +11,7 @@ public:
   int vehicleId{0};
   Date start;
   Date end;
-  QString status{"Active"};
+  QString status{"Active"}; // Active or Returned
 
   Reservation() = default;
   Reservation(int customerId_, int vehicleId_, Date start_, Date end_)

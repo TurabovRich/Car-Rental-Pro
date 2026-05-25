@@ -15,7 +15,7 @@ public:
   Invoice() = default;
   Invoice(int id_, int reservationId_, double subtotal_, double lateFee_, double damageFee_)
     : id(id_), reservationId(reservationId_), subtotal(subtotal_), lateFee(lateFee_), damageFee(damageFee_) {
-      vat = subtotal * VAT_RATE;
+      vat = subtotal * VAT_RATE; // 12% vat
       total = subtotal + vat + lateFee + damageFee;
     }
 };

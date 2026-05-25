@@ -8,12 +8,13 @@
 
 class FileManager;
 
+// main business logic — UI calls this, not FileManager directly
 class RentalService {
 public:
   explicit RentalService(FileManager* storage);
 
-  VehiclePtr findVehicle(int id) const;
-  VehiclePtr findVehicle(const QString& plate) const;
+  VehiclePtr findVehicle(int id) const;           // overload 1
+  VehiclePtr findVehicle(const QString& plate) const; // overload 2
   const Customer* findCustomer(int id) const;
 
   const std::vector<VehiclePtr>& vehicles() const { return m_vehicles; }

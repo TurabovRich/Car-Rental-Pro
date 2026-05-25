@@ -57,6 +57,7 @@ MainWindow::MainWindow(RentalService* service,
 
   m_tabs = new QTabWidget(root);
 
+  // admin vs user see different tabs
   if (m_mode == Mode::Admin) {
     m_carsTab = new CarsTab(m_service, m_tabs);
     m_customersTab = new CustomersTab(m_service, m_tabs);
@@ -94,11 +95,12 @@ MainWindow::MainWindow(RentalService* service,
     if (m_userProfileTab) m_userProfileTab->refresh();
   };
 
+  // reload table when switching tabs
   connect(m_tabs, &QTabWidget::currentChanged, this, [refreshAll](int){ refreshAll(); });
   refreshAll();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
   QMainWindow::closeEvent(event);
-  emit sessionEnded();
+  emit sessionEnded(); // tells main.cpp to leave the event loop
 }

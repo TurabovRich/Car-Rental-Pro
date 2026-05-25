@@ -16,6 +16,7 @@ QString RentalService::dataDir() const {
 void RentalService::load() {
   if (!m_storage) throw FileException("Storage not configured");
   m_storage->loadAll(m_vehicles, m_customers, m_reservations, m_invoices);
+  // new reservations get id after what's already in file
   int maxId = 0;
   for (const auto& r : m_reservations) maxId = std::max(maxId, r.id);
   Reservation::nextId = maxId + 1;
@@ -110,6 +111,7 @@ bool RentalService::isVehicleAvailableForRange(int vehicleId, const Date& start,
   auto v = findVehicle(vehicleId);
   if (!v) return false;
 
+  // check overlap with other active bookings on same car
   for (const auto& r : m_reservations) {
     if (r.vehicleId != vehicleId) continue;
     if (r.status != "Active") continue;
@@ -150,7 +152,7 @@ Invoice RentalService::processReturn(int reservationId, int lateDays, double dam
 
   int days = Date::daysBetween(it->start, it->end);
   double subtotal = days * v->dailyRate();
-  double lateFee = lateDays * (v->dailyRate() * 1.5);
+  double lateFee = lateDays * (v->dailyRate() * 1.5); // 150% per late day
 
   Invoice inv(nextInvoiceId(), reservationId, subtotal, lateFee, damageFee);
   m_invoices.push_back(inv);

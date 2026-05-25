@@ -1,6 +1,8 @@
 #pragma once
 #include "domain/Vehicle.h"
 
+// different car types = different price per day (polymorphism)
+
 class Sedan : public Vehicle {
 public:
   using Vehicle::Vehicle;
@@ -29,6 +31,7 @@ public:
   double dailyRate() const override { return basePrice * 1.10; }
 };
 
+// premium = SUV price + extra 20%
 class PremiumSUV : public SUV {
 public:
   using SUV::SUV;

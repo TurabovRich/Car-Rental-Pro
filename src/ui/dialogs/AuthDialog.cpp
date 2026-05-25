@@ -44,7 +44,7 @@ AuthDialog::AuthDialog(AuthService* auth, QWidget* parent)
   m_tabs = new QTabWidget(this);
   root->addWidget(m_tabs, 1);
 
-  // Login tab
+  // --- login tab ---
   {
     auto* page = new QWidget(m_tabs);
     auto* pageLayout = new QVBoxLayout(page);
@@ -85,7 +85,7 @@ AuthDialog::AuthDialog(AuthService* auth, QWidget* parent)
     updateAdminHint();
   }
 
-  // Register tab
+  // --- register tab (creates customer + user) ---
   {
     auto* page = new QWidget(m_tabs);
     auto* pageLayout = new QVBoxLayout(page);

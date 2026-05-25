@@ -3,6 +3,7 @@
 #include <memory>
 #include <ostream>
 
+// base car class — Sedan/SUV/etc override type() and dailyRate()
 class Vehicle {
 public:
   int id{0};

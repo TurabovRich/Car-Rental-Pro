@@ -20,6 +20,7 @@ void AuthService::save() {
   m_storage->saveUsers(m_users);
 }
 
+// store hash in csv, not the real password
 QString AuthService::hashPasswordHex(const QString& password) {
   auto bytes = password.toUtf8();
   return QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex();
@@ -45,6 +46,7 @@ bool AuthService::usernameTaken(const QString& username) const {
   return false;
 }
 
+// first time: create admin/admin so we can log in
 void AuthService::ensureDefaultAdmin() {
   bool hasAdmin = false;
   for (const auto& u : m_users) {
@@ -90,6 +92,7 @@ UserAccount AuthService::registerUser(const QString& username,
   Validation::requirePhone(phone);
   if (usernameTaken(u)) throw ValidationException("Username already taken");
 
+  // user needs a customer row too (for bookings)
   int customerId = nextCustomerId();
   m_rental->addCustomer(Customer(customerId, fullName.trimmed(), licenseNo.trimmed(), phone.trimmed()));
 

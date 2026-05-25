@@ -205,6 +205,7 @@ void UserPortalTab::updatePreview() {
   }
 }
 
+// user clicked reserve — goes through RentalService like admin booking
 void UserPortalTab::onReserveSelected() {
   try {
     if (!m_service) return;

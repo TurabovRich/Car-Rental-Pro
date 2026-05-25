@@ -1,3 +1,4 @@
+// all csv read/write lives here
 #include "storage/FileManager.h"
 #include "domain/Vehicles.h"
 #include "utils/Exceptions.h"
@@ -9,6 +10,7 @@ static QStringList splitCsvLine(const QString& line) {
   return line.split(",", Qt::KeepEmptyParts);
 }
 
+// csv has type as string, we pick the right subclass
 static VehiclePtr makeVehicle(const QString& type, int id, const QString& brand, const QString& model,
                               int year, const QString& plate, double basePrice, bool avail) {
   if (type == "SUV") return std::make_shared<SUV>(id, brand, model, year, plate, basePrice, avail);
@@ -41,7 +43,7 @@ void FileManager::loadAll(std::vector<VehiclePtr>& vehicles,
     while (!in.atEnd()) {
       QString line = in.readLine().trimmed();
       if (line.isEmpty()) continue;
-      if (first) { first = false; continue; }
+      if (first) { first = false; continue; } // skip header line
       auto cols = splitCsvLine(line);
       if (cols.size() < 8) continue;
 

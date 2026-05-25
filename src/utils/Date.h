@@ -1,6 +1,7 @@
 #pragma once
 #include <QString>
 
+// dates in reservations (yyyy-mm-dd in csv)
 class Date {
 public:
   int y{1970}, m{1}, d{1};

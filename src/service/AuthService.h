@@ -8,6 +8,7 @@
 class FileManager;
 class RentalService;
 
+// login + register, users.csv
 class AuthService {
 public:
   AuthService(FileManager* storage, RentalService* rental);

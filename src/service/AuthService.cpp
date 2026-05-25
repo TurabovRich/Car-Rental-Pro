@@ -5,8 +5,6 @@
 #include "utils/Exceptions.h"
 #include "utils/Validation.h"
 
-#include <QCryptographicHash>
-
 AuthService::AuthService(FileManager* storage, RentalService* rental)
   : m_storage(storage), m_rental(rental) {}
 
@@ -18,12 +16,6 @@ void AuthService::load() {
 void AuthService::save() {
   if (!m_storage) throw FileException("Storage not configured");
   m_storage->saveUsers(m_users);
-}
-
-// store hash in csv, not the real password
-QString AuthService::hashPasswordHex(const QString& password) {
-  auto bytes = password.toUtf8();
-  return QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex();
 }
 
 int AuthService::nextUserId() const {
@@ -57,7 +49,7 @@ void AuthService::ensureDefaultAdmin() {
   UserAccount admin;
   admin.id = nextUserId();
   admin.username = "admin";
-  admin.passwordHashHex = hashPasswordHex("admin");
+  admin.password = "admin";
   admin.role = "Admin";
   admin.customerId = 0;
   m_users.push_back(admin);
@@ -67,10 +59,9 @@ void AuthService::ensureDefaultAdmin() {
 bool AuthService::login(const QString& username, const QString& password, UserAccount& out) const {
   QString u = username.trimmed();
   if (u.isEmpty()) return false;
-  QString want = hashPasswordHex(password);
   for (const auto& acc : m_users) {
     if (acc.username.compare(u, Qt::CaseInsensitive) == 0 &&
-        acc.passwordHashHex.compare(want, Qt::CaseInsensitive) == 0) {
+        acc.password == password) {
       out = acc;
       return true;
     }
@@ -99,7 +90,7 @@ UserAccount AuthService::registerUser(const QString& username,
   UserAccount acc;
   acc.id = nextUserId();
   acc.username = u;
-  acc.passwordHashHex = hashPasswordHex(password);
+  acc.password = password;
   acc.role = "User";
   acc.customerId = customerId;
   m_users.push_back(acc);

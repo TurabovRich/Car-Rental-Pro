@@ -200,7 +200,7 @@ void FileManager::loadUsers(std::vector<UserAccount>& users) {
     UserAccount u;
     u.id = cols[0].toInt();
     u.username = cols[1];
-    u.passwordHashHex = cols[2];
+    u.password = cols[2];
     u.role = cols[3];
     u.customerId = (cols.size() >= 5) ? cols[4].toInt() : 0;
     users.push_back(u);
@@ -212,9 +212,9 @@ void FileManager::saveUsers(const std::vector<UserAccount>& users) {
   if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
     throw FileException("Cannot write " + usersPath().toStdString());
   QTextStream out(&f);
-  out << "id,username,passwordHashHex,role,customerId\n";
+  out << "id,username,password,role,customerId\n";
   for (const auto& u : users) {
-    out << u.id << "," << u.username << "," << u.passwordHashHex << ","
+    out << u.id << "," << u.username << "," << u.password << ","
         << u.role << "," << u.customerId << "\n";
   }
 }

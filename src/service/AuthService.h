@@ -27,8 +27,6 @@ public:
 
   const std::vector<UserAccount>& users() const { return m_users; }
 
-  static QString hashPasswordHex(const QString& password);
-
 private:
   int nextUserId() const;
   int nextCustomerId() const;
